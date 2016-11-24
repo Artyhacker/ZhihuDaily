@@ -7,13 +7,11 @@ import android.graphics.Bitmap;
  */
 
 public class NewsBean {
-    public Bitmap images;
-    public String type;
-    public String id;
-    public String ga_prefix;
+    public String images;
+    public int id;
     public String title;
 
-    public NewsBean(String id, String title, Bitmap images) {
+    public NewsBean(int id, String title, String images) {
         this.images = images;
         this.id = id;
         this.title = title;

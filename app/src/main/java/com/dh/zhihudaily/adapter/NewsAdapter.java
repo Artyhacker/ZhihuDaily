@@ -1,7 +1,8 @@
 package com.dh.zhihudaily.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,9 +11,8 @@ import android.widget.TextView;
 
 import com.dh.zhihudaily.R;
 import com.dh.zhihudaily.bean.NewsBean;
-import com.dh.zhihudaily.utils.UrlUtil;
+import com.facebook.drawee.view.SimpleDraweeView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -39,7 +39,7 @@ public class NewsAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return Long.parseLong(newsBeanArray.get(position).id);
+        return newsBeanArray.get(position).id;
     }
 
     @Override
@@ -50,10 +50,13 @@ public class NewsAdapter extends BaseAdapter {
         else{
             view = View.inflate(context, R.layout.item_news, null);
         }
-        ImageView ivItemImage = (ImageView) view.findViewById(R.id.iv_item_image);
+        SimpleDraweeView ivItemImage = (SimpleDraweeView) view.findViewById(R.id.iv_item_image);
         TextView tvItemTitle = (TextView) view.findViewById(R.id.tv_item_title);
         NewsBean bean = newsBeanArray.get(position);
-        ivItemImage.setImageBitmap(bean.images);
+        //ivItemImage.setImageBitmap(bean.images);
+        //Log.d("Adapter", bean.images);
+        Uri uri = Uri.parse(bean.images);
+        ivItemImage.setImageURI(uri);
         tvItemTitle.setText(bean.title);
         return view;
     }
