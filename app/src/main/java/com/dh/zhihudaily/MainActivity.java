@@ -12,7 +12,11 @@ import com.dh.zhihudaily.adapter.NewsAdapter;
 import com.dh.zhihudaily.bean.NewsBean;
 import com.dh.zhihudaily.utils.NewsUtil;
 import com.dh.zhihudaily.utils.StreamUtil;
+import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.listener.RequestListener;
+import com.facebook.imagepipeline.listener.RequestLoggingListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +24,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,8 +57,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        Fresco.initialize(this);
+
         mContext = this;
+
+        Set<RequestListener> requestListeners = new HashSet<>();
+        requestListeners.add(new RequestLoggingListener());
+        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+                .setRequestListeners(requestListeners)
+                .build();
+        Fresco.initialize(this,config);
+        FLog.setMinimumLoggingLevel(FLog.VERBOSE);
 
         newsBeanArray = NewsUtil.getNewsForDatabase(mContext);
         if(newsBeanArray != null && newsBeanArray.size() > 0) {

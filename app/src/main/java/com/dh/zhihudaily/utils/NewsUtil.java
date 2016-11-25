@@ -31,7 +31,7 @@ public class NewsUtil {
             JSONArray stories = object.getJSONArray("stories");
             for(int i = 0; i < stories.length(); i++) {
                 JSONObject story = (JSONObject) stories.get(i);
-                final String images = story.getString("images").replace("\\", "");
+                final String images = story.getJSONArray("images").getString(0);
                 //Log.d("Main", images);
                 final int id = story.getInt("id");
                 final String title = story.getString("title");

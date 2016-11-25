@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import com.dh.zhihudaily.R;
 import com.dh.zhihudaily.bean.NewsBean;
+import com.facebook.common.util.UriUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -50,13 +52,13 @@ public class NewsAdapter extends BaseAdapter {
         else{
             view = View.inflate(context, R.layout.item_news, null);
         }
-        SimpleDraweeView ivItemImage = (SimpleDraweeView) view.findViewById(R.id.iv_item_image);
+        SimpleDraweeView simpleDraweeView = (SimpleDraweeView) view.findViewById(R.id.iv_item_image);
         TextView tvItemTitle = (TextView) view.findViewById(R.id.tv_item_title);
         NewsBean bean = newsBeanArray.get(position);
-        //ivItemImage.setImageBitmap(bean.images);
-        //Log.d("Adapter", bean.images);
+
         Uri uri = Uri.parse(bean.images);
-        ivItemImage.setImageURI(uri);
+        
+        simpleDraweeView.setImageURI(uri);
         tvItemTitle.setText(bean.title);
         return view;
     }
