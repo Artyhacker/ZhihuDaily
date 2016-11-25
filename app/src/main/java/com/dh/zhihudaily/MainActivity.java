@@ -29,6 +29,11 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by dh on 16-11-22.
@@ -57,16 +62,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+        Fresco.initialize(this);
         mContext = this;
-
-        Set<RequestListener> requestListeners = new HashSet<>();
-        requestListeners.add(new RequestLoggingListener());
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setRequestListeners(requestListeners)
-                .build();
-        Fresco.initialize(this,config);
-        FLog.setMinimumLoggingLevel(FLog.VERBOSE);
 
         newsBeanArray = NewsUtil.getNewsForDatabase(mContext);
         if(newsBeanArray != null && newsBeanArray.size() > 0) {
@@ -77,38 +74,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getNewsForInternet() {
-        new Thread(new Runnable() {
-            HttpURLConnection conn = null;
+        final OkHttpClient mOkHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url(GET_NEWS_URL)
+                .build();
+        Call call = mOkHttpClient.newCall(request);
+        call.enqueue(new Callback() {
             @Override
-            public void run() {
-                try {
-                    URL url = new URL(GET_NEWS_URL);
-                    conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setConnectTimeout(5000);
-                    conn.setReadTimeout(5000);
-                    int responseCode = conn.getResponseCode();
-                    if(responseCode == 200) {
-                        InputStream is = conn.getInputStream();
-                        String response = StreamUtil.streamToString(is);
-                        newsBeanArray = NewsUtil.parseNewsJSON(mContext, response);
-                        Message message = new Message();
-                        message.what = 0;
-                        handler.sendMessage(message);
-                    } else {
-                        Toast.makeText(getApplicationContext(),"网络错误!",Toast.LENGTH_SHORT).show();
-                    }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if(conn != null)
-                        conn.disconnect();
-                }
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(mContext, "网络错误！", Toast.LENGTH_SHORT).show();
             }
-        }).start();
 
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String htmlStr = response.body().string();
+                newsBeanArray = NewsUtil.parseNewsJSON(mContext, htmlStr);
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+        });
     }
-
 }

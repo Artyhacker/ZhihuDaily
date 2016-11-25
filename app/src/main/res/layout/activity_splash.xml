@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+
+    <com.facebook.drawee.view.SimpleDraweeView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:id="@+id/iv_splash_splash"/>
-
+        android:id="@+id/iv_splash_splash" />
     <TextView
         android:id="@+id/tv_splash_text"
         android:layout_width="wrap_content"
