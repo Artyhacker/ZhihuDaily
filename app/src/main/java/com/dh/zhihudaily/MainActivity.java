@@ -1,31 +1,23 @@
 package com.dh.zhihudaily;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.dh.zhihudaily.adapter.NewsAdapter;
 import com.dh.zhihudaily.bean.NewsBean;
 import com.dh.zhihudaily.utils.NewsUtil;
-import com.dh.zhihudaily.utils.StreamUtil;
-import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.listener.RequestListener;
-import com.facebook.imagepipeline.listener.RequestLoggingListener;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,10 +31,11 @@ import okhttp3.Response;
  * Created by dh on 16-11-22.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private ArrayList<NewsBean> newsBeanArray = new ArrayList<>();
     private static final String GET_NEWS_URL = "http://news-at.zhihu.com/api/4/news/latest";
+    private static final String NEWS_ADD_URL = "http://news-at.zhihu.com/api/4/news/";
     private Context mContext;
     private NewsAdapter adapter;
 
@@ -71,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
             lvNewsList.setAdapter(adapter);
         }
         getNewsForInternet();
+
+        lvNewsList.setOnItemClickListener(this);
     }
 
     private void getNewsForInternet() {
@@ -94,5 +89,14 @@ public class MainActivity extends AppCompatActivity {
                 handler.sendMessage(message);
             }
         });
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String newAtUrl = NEWS_ADD_URL + newsBeanArray.get(position).id;
+        //Toast.makeText(mContext,"url: " + newAtUrl, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(mContext,NewsActivity.class);
+        intent.putExtra("url", newAtUrl);
+        startActivity(intent);
     }
 }
