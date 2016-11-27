@@ -84,7 +84,6 @@ public class SplashActivity extends AppCompatActivity {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(getApplicationContext(), "网络错误", Toast.LENGTH_SHORT).show();
             }
 
             @Override

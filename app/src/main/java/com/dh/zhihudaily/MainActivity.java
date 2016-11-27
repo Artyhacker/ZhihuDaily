@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "网络错误！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -94,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String newAtUrl = NEWS_ADD_URL + newsBeanArray.get(position).id;
-        //Toast.makeText(mContext,"url: " + newAtUrl, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(mContext,NewsActivity.class);
         intent.putExtra("url", newAtUrl);
         startActivity(intent);

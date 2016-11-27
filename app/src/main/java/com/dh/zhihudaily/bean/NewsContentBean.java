@@ -11,4 +11,5 @@ public class NewsContentBean {
     public String title;
     public String shareUrl;
     public String id;
+    public String cssUrl;
 }
