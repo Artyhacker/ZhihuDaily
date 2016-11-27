@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 handler.sendMessage(message);
             }
         });
-        Toast.makeText(mContext,"刷新了！", Toast.LENGTH_SHORT).show();
     }
 
     @Override

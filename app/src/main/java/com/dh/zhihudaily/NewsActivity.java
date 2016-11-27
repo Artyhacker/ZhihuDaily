@@ -8,12 +8,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +28,10 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.PtrHandler;
+import in.srain.cube.views.ptr.header.StoreHouseHeader;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -51,6 +55,8 @@ public class NewsActivity extends AppCompatActivity {
     TextView tvNewsImageSource;
     @BindView(R.id.wv_news_content)
     WebView wvNewsContent;
+    @BindView(R.id.news_ptr_frame)
+    PtrFrameLayout newsPtrFrame;
 
 
     @Override
@@ -62,21 +68,25 @@ public class NewsActivity extends AppCompatActivity {
         mContext = this;
 
         WebSettings settings = wvNewsContent.getSettings();
-        //settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         settings.setJavaScriptEnabled(true);
-        //settings.setUseWideViewPort(true);
-        //settings.setLoadWithOverviewMode(true);
-        //settings.setSupportZoom(false);
-        //settings.setDisplayZoomControls(false);
-        //settings.supportMultipleWindows();
-        //settings.setSupportMultipleWindows(true);
 
-        //http://news-at.zhihu.com/api/4/news/9007077
         newsContentBean = new NewsContentBean();
         newsAtUrl = getIntent().getStringExtra("url");
-        Log.d("News", newsAtUrl);
+        //Log.d("News", newsAtUrl);
         getNewsContent(newsAtUrl);
 
+        newsPtrFrame.setPtrHandler(new PtrHandler() {
+            @Override
+            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+                return PtrDefaultHandler.checkContentCanBePulledDown(frame,content,header);
+            }
+
+            @Override
+            public void onRefreshBegin(PtrFrameLayout frame) {
+                getNewsContent(newsAtUrl);
+                newsPtrFrame.refreshComplete();
+            }
+        });
 
     }
 
@@ -87,63 +97,8 @@ public class NewsActivity extends AppCompatActivity {
 
         String htmlData = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + newsContentBean.cssUrl + "\" />"
                 +newsContentBean.body;
-        //Log.d("News", "css: " + newsContentBean.cssUrl);
         wvNewsContent.loadDataWithBaseURL(null, htmlData, "text/html","UTF-8", null);
-        //setWebView();
     }
-
-    /*
-    private void setWebView() {
-
-        setUpWebViewDefaults(wvNewsContent);
-        wvNewsContent.setWebViewClient(mWebViewClient);
-    }
-
-    @SuppressLint("NewApi")
-    private WebViewClient mWebViewClient = new WebViewClient(){
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(url));
-            startActivity(intent);
-            return true;
-        }
-
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            super.onPageFinished(view, url);
-
-        }
-    }
-
-    private void setUpWebViewDefaults(WebView wvNewsContent) {
-
-        wvNewsContent.addJavascriptInterface(new JavascriptObject(mContext), "injectedObject");
-        WebSettings settings = wvNewsContent.getSettings();
-
-        //设置缓存模式
-        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        settings.setJavaScriptEnabled(true);
-
-        settings.setUseWideViewPort(true);
-        settings.setLoadWithOverviewMode(true);
-        wvNewsContent.setVerticalScrollBarEnabled(false);
-        wvNewsContent.setHorizontalScrollBarEnabled(false);
-
-        //支持通过JS打开新的窗口
-        settings.setJavaScriptCanOpenWindowsAutomatically(true);
-        wvNewsContent.setWebChromeClient(new WebChromeClient(){
-            @Override
-            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-                result.cancel();
-                return true;
-            }
-
-            @Override
-            public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
-                return true;
-            }
-        });
-    }*/
 
     private void getNewsContent(String newsAtUrl) {
         final OkHttpClient mOkHttpClient = new OkHttpClient();
@@ -154,7 +109,6 @@ public class NewsActivity extends AppCompatActivity {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "网络错误！", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -196,19 +150,4 @@ public class NewsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-/*
-    private class JavascriptObject {
-        private Activity mInstance;
-        public JavascriptObject(Activity instance) {
-            mInstance = instance;
-        }
-        @JavascriptInterface
-        public void openImage(String uri){
-            if (mInstance != null && !mInstance.isFinishing()) {
-                Intent intent = new Intent(mInstance, NewsDetailImageActivity.class);
-                intent.putExtra("imageUrl", url);
-                mInstance.startActivity(intent);
-            }
-        }
-    }*/
 }
