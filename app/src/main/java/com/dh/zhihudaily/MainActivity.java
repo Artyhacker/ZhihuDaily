@@ -21,6 +21,10 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.PtrHandler;
+import in.srain.cube.views.ptr.header.StoreHouseHeader;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     //private String date = "";
     @BindView(R.id.lv_main_news)
     ListView lvNewsList;
+    @BindView(R.id.main_ptr_frame)
+    PtrFrameLayout ptrFrameLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         getNewsForInternet();
 
         lvNewsList.setOnItemClickListener(this);
+
+        ptrFrameLayout.setPtrHandler(new PtrHandler() {
+            @Override
+            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+                return PtrDefaultHandler.checkContentCanBePulledDown(frame,content,header);
+            }
+
+            @Override
+            public void onRefreshBegin(PtrFrameLayout frame) {
+                getNewsForInternet();
+                ptrFrameLayout.refreshComplete();
+            }
+        });
     }
 
     private void getNewsForInternet() {
@@ -88,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 handler.sendMessage(message);
             }
         });
+        Toast.makeText(mContext,"刷新了！", Toast.LENGTH_SHORT).show();
     }
 
     @Override
